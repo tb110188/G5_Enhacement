@@ -18,10 +18,10 @@ class AttitudeIndicator extends HTMLElement {
         this.lowMaxBankAngle = 15;
         this.aspectRatio = 1.0;
         this.isBackup = false;
-        this.horizonTopColor = "#3062C8";  // Adjusted colour
-        this.horizonBottomColor = "#864B01"; // Adjusted colour
-        this.horizonTopColorLight = "#5F8AE0";  // Adjusted colour
-        this.horizonBottomColorLight = "#A66C1D"; // Adjusted colour 
+        this.horizonTopColor = "#3062C8";  // Adjusted color
+        this.horizonBottomColor = "#864B01"; // Adjusted color
+        this.horizonTopColorLight = "#5F8AE0";  // Adjusted color
+        this.horizonBottomColorLight = "#A66C1D"; // Adjusted color 
         this.horizonTopGradient = '';   //
         this.horizonBottomGradient = '';     //           
         this.GF_font = 'Montserrat-Bold';

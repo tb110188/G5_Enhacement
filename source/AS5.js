@@ -85,6 +85,28 @@ class AS5 extends NavSystem {
         this.selectionValueElement.setContext("Select Heading", this.getMenuHeadingText.bind(this), this.incrementHeading.bind(this), this.decrementHeading.bind(this), this.syncHeading.bind(this));
         this.switchToPopUpPage(this.selectionValueWindow);
     }
+    getMenuCrsText() {
+        let crs = fastToFixed(Simplane.getNavObs(1), 0);
+        let crsValue = parseFloat(crs);
+        if (crsValue == 0) {
+            crsValue = 360;
+        }
+        crs = crsValue + '';
+        return ("000".slice(crs.length) + crs + Avionics.Utils.DEGREE_SYMBOL);
+    }
+    incrementCrs() {        
+        SimVar.SetSimVarValue("K:VOR1_OBI_INC", "number", 0);
+    }
+    decrementCrs() {        
+        SimVar.SetSimVarValue("K:VOR1_OBI_DEC", "number", 0);
+    }
+    syncCrs() {
+    
+    }
+    menuCrsEnter() {
+        this.selectionValueElement.setContext("Select Course", this.getMenuCrsText.bind(this), this.incrementCrs.bind(this), this.decrementCrs.bind(this), this.syncCrs.bind(this));
+        this.switchToPopUpPage(this.selectionValueWindow);
+    }
     getMenuAltitudeText() {
         return fastToFixed(SimVar.GetSimVarValue("AUTOPILOT ALTITUDE LOCK VAR", "feet"), 0) + "ft";
     }
@@ -140,6 +162,7 @@ class AS5_MFD extends NavSystemPage {
         this.defaultMenu = new ContextualMenu("", [
             new ContextualMenuElementImage("Back", this.gps.SwitchToInteractionState.bind(this.gps, 0), "/Pages/VCockpit/Instruments/NavSystems/AS5/Images/BACK_ARROW.png", false),
             new ContextualMenuElementValue("Heading", this.gps.menuHeadingEnter.bind(this.gps), this.gps.getMenuHeadingText.bind(this.gps), false),
+            new ContextualMenuElementValue("Course", this.gps.menuCrsEnter.bind(this.gps), this.gps.getMenuCrsText.bind(this.gps), false),
             new ContextualMenuElementImage("PFD", this.gps.SwitchToPageName.bind(this.gps, "Main", "PFD"), "/Pages/VCockpit/Instruments/NavSystems/AS5/Images/PFD.png", false),
             new ContextualMenuElementImage("Setup", null, "/Pages/VCockpit/Instruments/NavSystems/AS5/Images/SETUP.png", true),
         ]);
@@ -175,7 +198,7 @@ class AS5_PFD_CDI extends NavSystemElement {
                 diffAndSetAttribute(this.cdi, "deviation-mode", "VLOC");
                 break;
             case 3:
-                diffAndSetStyle(this.cdi, StyleProperty.display, Simplane.getGPSWpNextID() != "" ? "inherit" : "none");
+                diffAndSetStyle(this.cdi, StyleProperty.display, SimVar.GetSimVarValue("GPS WP NEXT ID", "string") != "" ? "inherit" : "none");
                 diffAndSetAttribute(this.cdi, "deviation", SimVar.GetSimVarValue("GPS WP CROSS TRK", "nautical mile"));
                 diffAndSetAttribute(this.cdi, "deviation-mode", "GPS");
                 break;
@@ -215,13 +238,13 @@ class AS5_MFD_HSI extends PFD_Compass {
                     case 2:
                         let distance = parseFloat(this.hsi.getAttribute("dme_distance"));
                         if (!isNaN(distance))
-                            distanceText = fastToFixed(distance, 2);
+                            distanceText = fastToFixed(distance, 1);
                         diffAndSetText(this.waypointDistanceValue, distanceText);
                         diffAndSetAttribute(this.waypointDistanceValue, "mode", "VOR");
                         break;
                     case 3:
-                        if (Simplane.getGPSWpNextID() != "")
-                            distanceText = fastToFixed(SimVar.GetSimVarValue("GPS WP DISTANCE", "nautical mile"), 2);
+                        if (SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") == true)
+                            distanceText = fastToFixed(SimVar.GetSimVarValue("GPS WP DISTANCE", "nautical mile"), 1);
                         diffAndSetText(this.waypointDistanceValue, distanceText);
                         diffAndSetAttribute(this.waypointDistanceValue, "mode", "GPS");
                         break;
